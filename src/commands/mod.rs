@@ -1,1 +1,2 @@
-pub mod example;
+pub mod hello;
+pub mod grpc;

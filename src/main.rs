@@ -1,8 +1,9 @@
 mod commands;
 mod log;
+mod grpc;
 
 use clap::{arg,Command, App};
-use commands::{example};
+use commands::{hello, grpc as command_grpc};
 use ::log::LevelFilter;
 use crate::log::logger;
 
@@ -16,7 +17,8 @@ fn init() -> App<'static> {
             arg!(-v --verbose "Enable verbose mode").required(false),
         )
         .subcommand_required(true)
-        .subcommand(example::command::init());
+        .subcommand(command_grpc::server::init())
+        .subcommand(hello::command::init());
 
     cmd
 }
@@ -26,15 +28,16 @@ fn main() {
     let matches = cmd.get_matches();
 
     let logger_level = if matches.is_present("verbose") {
-        LevelFilter::Trace
+        LevelFilter::Debug
     } else {
-        LevelFilter::Error
+        LevelFilter::Info
     };
 
     logger::init(logger_level);
 
     match matches.subcommand() {
-        Some((example::command::NAME, matches)) => example::command::handle(matches),
+        Some((hello::command::NAME, matches)) => hello::command::handle(matches),
+        Some((command_grpc::server::NAME, matches)) => command_grpc::server::handle(matches),
         _ => unreachable!("Unknown command."),
     };
 }
