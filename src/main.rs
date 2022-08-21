@@ -1,9 +1,10 @@
 mod commands;
 mod log;
 mod grpc;
+mod http;
 
 use clap::{arg,Command, App};
-use commands::{hello, grpc as command_grpc};
+use commands::{hello, grpc as command_grpc, http as command_http};
 use ::log::LevelFilter;
 use crate::log::logger;
 
@@ -18,6 +19,7 @@ fn init() -> App<'static> {
         )
         .subcommand_required(true)
         .subcommand(command_grpc::server::init())
+        .subcommand(command_http::server::init())
         .subcommand(hello::command::init());
 
     cmd
@@ -38,6 +40,7 @@ fn main() {
     match matches.subcommand() {
         Some((hello::command::NAME, matches)) => hello::command::handle(matches),
         Some((command_grpc::server::NAME, matches)) => command_grpc::server::handle(matches),
+        Some((command_http::server::NAME, matches)) => command_http::server::handle(matches),
         _ => unreachable!("Unknown command."),
     };
 }
